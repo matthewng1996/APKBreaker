@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
@@ -45,7 +46,7 @@ public class APKBreakerGUI extends Application {
     BorderPane right;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
 
         primaryStage.setTitle("APKBreaker");
 
@@ -84,9 +85,13 @@ public class APKBreakerGUI extends Application {
         //Set log console properties
         outputArea.setStyle("-fx-control-inner-background:#000000; -fx-font-family: Consolas; -fx-highlight-fill: #00ff00; -fx-highlight-text-fill: #000000; -fx-text-fill: #00ff00;");
         outputArea.setEditable(false);
+        TextAreaOuputStream console = new TextAreaOuputStream(outputArea);
+        PrintStream ps = new PrintStream(console, true);
+        System.setOut(ps);
+        System.setErr(ps);
 
-        writeOutput(logo);
-        writeOutput("[ * ] Welcome to APKBreaker! To begin, simply upload your APK in the 'File' settings. File > Upload new APK");
+        System.out.println(logo);
+        System.out.println("[ * ] Welcome to APKBreaker! To begin, simply upload your APK in the 'File' settings. File > Upload new APK");
 
         Scene scene = new Scene(gui, 1000, 800);
         primaryStage.setScene(scene);
@@ -138,12 +143,6 @@ public class APKBreakerGUI extends Application {
         return menuBar;
     }
 
-    // Method to log the Message to the Output-Area
-    private void writeOutput(String msg)
-    {
-        this.outputArea.appendText(msg + "\n");
-    }
-
     private void FileUpload(Stage stage) {
         final FileChooser fileChooser = new FileChooser();
         configureFileChooser(fileChooser);
@@ -182,21 +181,16 @@ public class APKBreakerGUI extends Application {
                 XMLDecompressor xmlDecompressor = new XMLDecompressor();
 
                 String androidManifestXML = xmlDecompressor.decompressXML(buf);
-                writeOutput("[ * ]" + " Decompression successful");
 
-                //TODO: Put AndroidManifest File into the new Directory, not the directory where the application is started from.
                 String fileName = "AndroidManifest.xml";
                 Path newName = Paths.get(newPath.toString(),fileName);
                 fileProcesses.writeTextFile(androidManifestXML, newName.toString());
 
-                writeOutput("[ * ] AndroidManifest.xml decompressed.");
-
                 System.out.println("[ * ] Retrieving classes.dex file(s)...");
                 int totalNumOfDexFiles = fileProcesses.getClassesDex(zip, newZipFilePath);
-                writeOutput("[ * ] A total of " + totalNumOfDexFiles + " Classes.dex file(s) are extracted");
                 fileProcesses.readDexFiles(totalNumOfDexFiles, newPath);
             } catch (Exception e) {
-                writeOutput("[ !! ] File is not a valid zip file");
+                System.out.println("[ !! ] File is not a valid zip file");
             }
         }
     }
