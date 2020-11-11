@@ -180,10 +180,15 @@ public class APKBreakerGUI extends Application {
                 inputStream.close();
 
                 XMLDecompressor xmlDecompressor = new XMLDecompressor();
-                writeOutput("[ * ]" + xmlDecompressor);
+
                 String androidManifestXML = xmlDecompressor.decompressXML(buf);
-                writeOutput("[ * ]" + "Decompression successful");
-                fileProcesses.writeTextFile(androidManifestXML, "AndroidManifest.xml");
+                writeOutput("[ * ]" + " Decompression successful");
+
+                //TODO: Put AndroidManifest File into the new Directory, not the directory where the application is started from.
+                String fileName = "AndroidManifest.xml";
+                Path newName = Paths.get(newPath.toString(),fileName);
+                fileProcesses.writeTextFile(androidManifestXML, newName.toString());
+
                 writeOutput("[ * ] AndroidManifest.xml decompressed.");
 
                 System.out.println("[ * ] Retrieving classes.dex file(s)...");
@@ -197,11 +202,10 @@ public class APKBreakerGUI extends Application {
     }
 
     private void SaveProject() {
-
+        //TODO: Add save load
     }
 
     private void LoadProject() {
-
     }
 
     private void ExitApplication() {

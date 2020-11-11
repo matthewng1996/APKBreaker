@@ -22,12 +22,17 @@ public class FileProcesses {
     }
 
     public Path zipFile(Path path, File file, String new_extension, String dest) {
-
         int indexOfExt = file.getName().lastIndexOf('.');
         String name = file.getName().substring(0,indexOfExt);
         try {
-            Path destPath = Paths.get(path.getParent().toString(), dest, dest);
-            path = Files.copy(file.toPath(), destPath.resolveSibling(name + "." + new_extension), StandardCopyOption.REPLACE_EXISTING);
+            if (path.getParent() != null) {
+                Path destPath = Paths.get(path.getParent().toString(), dest, dest);
+                path = Files.copy(file.toPath(), destPath.resolveSibling(name + "." + new_extension), StandardCopyOption.REPLACE_EXISTING);
+            } else { //Path parent == null when the jar file is executed at the apk directory
+                Path destPath = Paths.get(name, dest);
+                path = Files.copy(file.toPath(), destPath.resolveSibling(name + "." + new_extension), StandardCopyOption.REPLACE_EXISTING);
+            }
+
             System.out.println("[ * ] zip file has been created from APK");
         } catch (Exception e) {
             System.out.println("[ !! } Unable to get path");
@@ -39,6 +44,7 @@ public class FileProcesses {
 
     public void writeTextFile(String contents, String fileName) {
         try {
+            //TODO: Add dest to AndroidManifest
             FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write(contents);
             fileWriter.close();

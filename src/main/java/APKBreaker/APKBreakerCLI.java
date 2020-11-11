@@ -58,10 +58,14 @@ public class APKBreakerCLI {
                 inputStream.close();
 
                 XMLDecompressor xmlDecompressor = new XMLDecompressor();
-                System.out.println("[ * ]" + xmlDecompressor);
+
                 String androidManifestXML = xmlDecompressor.decompressXML(buf);
-                System.out.println("[ * ]" + "Decompression successful");
-                fileProcesses.writeTextFile(androidManifestXML, "AndroidManifest.xml");
+                System.out.println("[ * ]" + " Decompression successful");
+
+                String fileName = "AndroidManifest.xml";
+                Path newName = Paths.get(newPath.toString(),fileName);
+                fileProcesses.writeTextFile(androidManifestXML, newName.toString());
+
                 System.out.println("[ * ] AndroidManifest.xml decompressed.");
 
                 System.out.println("[ * ] Retrieving classes.dex file(s)...");
